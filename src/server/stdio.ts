@@ -17,8 +17,8 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 
 import { getMcpServer } from './server'
 
-export async function runStdioServer (host: string, clientID: string, clientSecret: string) {
-  const server = getMcpServer(host, clientID, clientSecret)
+export async function runStdioServer (p4samdUrl: string, p4samdApiKey: string) {
+  const server = getMcpServer(p4samdUrl, p4samdApiKey)
   const transport = new StdioServerTransport()
 
   await server.connect(transport)

@@ -24,8 +24,6 @@ export const toolNames = {
   LIST_MARKETPLACE: 'list_marketplace',
   LIST_MARKETPLACE_ITEM_VERSIONS: 'list_marketplace_item_versions',
   MARKETPLACE_ITEM_VERSION_INFO: 'marketplace_item_version_info',
-  LIST_MARKETPLACE_ITEM_TYPE_DEFINITIONS: 'list_marketplace_item_type_definitions',
-  MARKETPLACE_ITEM_TYPE_DEFINITION_INFO: 'marketplace_item_type_definition_info',
 
   // project tools
   LIST_PROJECTS: 'list_projects',
@@ -45,12 +43,28 @@ export const toolNames = {
   LIST_CONFIGURATION_REVISIONS: 'list_configuration_revisions',
   CONFIGURATION_TO_SAVE: 'configuration_save',
   GET_CONFIGURATION: 'configuration_get',
-  CREATE_COLLECTION: 'create_collection',
-  CREATE_ENDPOINTS: 'create_endpoints',
 
   // runtime tools
   LIST_PODS: 'list_pods',
   GET_POD_LOGS: 'get_pod_logs',
+
+  // p4samd
+  LIST_VERSIONS: 'list_versions',
+  LIST_REQUIREMENTS: 'list_requirements',
+  GET_REQUIREMENT_BY_ID: 'get_requirement_by_id',
+
+  LIST_RISKS: 'list_risks',
+  GET_RISK_BY_ID: 'get_change_request_by_id.ts',
+
+  LIST_TESTS: 'list_tests',
+  GET_TEST_BY_ID: 'get_test_by_id',
+
+  LIST_CHANGE_REQUESTS: 'list_change_requests',
+  GET_CHANGE_REQUEST_BY_ID: 'get_change_request_by_id',
+
+  LIST_REFERENCES: 'list_references',
+
+  LIST_KPIS: 'list_kpis',
 }
 
 export const toolsDescriptions = {
@@ -58,11 +72,7 @@ export const toolsDescriptions = {
   LIST_TENANTS: 'List Mia-Platform Console companies or tenants that the user can access. Only companies or tenants with AI features enabled will be returned.',
   LIST_TENANTS_TEMPLATES: 'List Mia-Platform project templates for a given company or tenant',
   LIST_TENANTS_IAM: 'List IAM user, groups and or service account for a company or tenant',
-  VIEW_TENANTS_AUDIT_LOGS: `\
-View audit logs for a company or tenant, to receive a detailed list of operations performed in the tenant by every user. \
-You can filter the logs by date range. If no date range is specified by the user, please add a timestamp of the last 7 days. \
-Do never attemp to fetch all the logs without a date range filter, as it could lead to performance issues.\
-`,
+  VIEW_TENANTS_AUDIT_LOGS: 'View audit logs for a company or tenant to see who did what and when',
 
   // marketplace tools
   LIST_MARKETPLACE: `
@@ -71,8 +81,6 @@ Do never attemp to fetch all the logs without a date range filter, as it could l
   `,
   LIST_MARKETPLACE_ITEMS_VERSIONS: 'List all the available versions of a marketplace item',
   MARKETPLACE_ITEM_VERSION_INFO: 'Get information about a specific version of a marketplace item',
-  LIST_MARKETPLACE_ITEM_TYPE_DEFINITIONS: 'List the metadata of all the marketplace Item Type Definitions the caller has permission to see (i.e., the ones available to all tenants and the private ones of tenants the user has permission to see)',
-  MARKETPLACE_ITEM_TYPE_DEFINITION_INFO: 'Get information about a specific Item Type Definition identified by its compound primary key as path parameters (i.e., id of the tenant namespace, and name of the definition)',
 
   // project tools
   LIST_PROJECTS: `
@@ -106,10 +114,32 @@ Do never attemp to fetch all the logs without a date range filter, as it could l
 
   // configuration management tools
   LIST_CONFIGURATION_REVISIONS: 'List all the available revisions and tags for a project configuration',
-  CONFIGURATION_TO_SAVE: 'Save the configuration for a project.',
+  CONFIGURATION_TO_SAVE: 'Save the configuration for a project',
   GET_CONFIGURATION: 'Get the actual configuration for a project for a specific revision or tag',
-  CREATE_COLLECTION: `Create a new CRUD collection in a project. This tool accepts the collection name and user-defined fields, then automatically generates the complete collection structure including all mandatory fields (_id, creatorId, createdAt, updaterId, updatedAt, __STATE__), indexes, internal endpoints, and tags. If the crud-service does not exist in the project, it should be created first using the ${toolNames.CREATE_SERVICE_FROM_MARKETPLACE} tool.`,
-  CREATE_ENDPOINTS: 'Create endpoints in a Mia-Platform Console project. This tool accepts endpoint type (custom or crud), name, and target (service name for custom endpoints or collection name for crud endpoints), then automatically generates the complete endpoint structure with all required fields, routes, and configurations.',
+
+  // p4samd
+  LIST_VERSIONS: `Lists the System Versions.`,
+  LIST_REQUIREMENTS: `List the Requirements for a specific System Version. The API is paginated. I return also the total number of items. You can filter the requirements by type and search string.`,
+  GET_REQUIREMENT_BY_ID: `Get a specific Requirement by its _id.`,
+
+  LIST_RISKS: `List the Risks for a specific System Version. The API is paginated. I return also the total number of items. You can filter the risks by type and search string.`,
+  GET_RISK_BY_ID: `Get a specific Risk by its _id.`,
+
+  LIST_TESTS: `List the Tests for a specific System Version. The API is paginated. I return also the total number of items. You can filter the tests by type and search string.`,
+  GET_TEST_BY_ID: `Get a specific Test by its _id.`,
+
+  LIST_CHANGE_REQUESTS: `List the Change Requests for a specific System Version. The API is paginated. I return also the total number of items. You can filter the change requests by classification and search string.`,
+  GET_CHANGE_REQUEST_BY_ID: `Get a specific Change Request by its _id.`,
+
+  LIST_REFERENCES: `List all the References (Plans, SOPs, Regulations, Standards, Guidelines, etc.) used in the project.The API is paginated. I return also the total number of items. You can filter the references by search string.`,
+
+  LIST_KPIS: `List the KPIs for a specific System Version. The API returns 6 indexes, each of them show the number of done and total:
+  changesIndex: is the kpi about change requests,
+  requirementsIndex: is the kpi about requirements,
+  risksIndex: is the kpi about risks,
+  testsIndex: is the kpi about tests,
+  softwareItemsIndex: is the kpi about software items,
+  versionIndex: is the kpi about the system version overall progress.`,
 }
 
 export const paramsDescriptions = {
@@ -123,15 +153,14 @@ export const paramsDescriptions = {
   IAM_IDENTITY_TYPE: 'Filter the IAM entities by type',
 
   // Audit Logs
-  AUDIT_LOG_FROM: 'The start date of the audit logs to fetch, in ISO 8601 format (YYYY-MM-DDTHH:mm:ss, e.g., "2024-01-15T10:30:00"). Include this parameter to limit the logs if the parameter "to" is included as well.',
-  AUDIT_LOG_TO: 'The end date of the audit logs to fetch, in ISO 8601 format (YYYY-MM-DDTHH:mm:ss, e.g., "2024-01-15T23:59:59"). Include this parameter to limit the logs if the parameter "from" is included as well.',
+  AUDIT_LOG_FROM: 'The start date of the audit logs to fetch, in ISO 8601 format (YYYY-MM-DDTHH:mm:ss), e.g., "2024-01-15T10:30:00"',
+  AUDIT_LOG_TO: 'The end date of the audit logs to fetch, in ISO 8601 format (YYYY-MM-DDTHH:mm:ss), e.g., "2024-01-15T23:59:59"',
 
   // Marketplace
   MARKETPLACE_ITEM_ID: `The marketplace item to use to create the service. Can be found in the itemId field of the ${toolNames.LIST_MARKETPLACE} tool`,
   MARKETPLACE_ITEM_TYPE: `
   Type of marketplace item to filter, empty string means no filter.
-  It can be a full Item Type Definition URN (following the pattern \`urn:<itd.metadata.namespace.id>:mktp:itd:<itd.metadata.name>\`), or a just an Item Type Definition name (i.e., \`itd.metadata.name\`) which will be considered belonging to the Mia-Platform default namespace. The relevant Item Type Definition fields can be found in the metadata.namespace.id and metadata.name fields of the ${toolNames.LIST_MARKETPLACE_ITEM_TYPE_DEFINITIONS} tool.
-  The following values are built-in types belonging to the default Mia-Platform namespace:
+  Possible values are:
   - application: Applications are bundles of resources that brings together services (i.e., plugins, templates, and examples), endpoints, CRUD collections, and public variables to ease the setup of large-scale artifacts.
   - example: Examples works no differently than templates, in the sense that they too provide an archive with base configurations. Unlike templates, examples should come with some features already implemented and tailored to help the user better familiarize with the development environment.
   - extension: Extensions are custom pages that enhances Console capabilities by integrating it into the sidebar navigation. Since extensions have their own dedicated section, they are left out by the Software Catalog UI. Extensions can still be managed with miactl, and API calls.
@@ -139,7 +168,7 @@ export const paramsDescriptions = {
   - plugin: Plugins are services that can be instantiated from the microservices section of the Console Design area. Practically speaking, plugins are Docker images that comes with some predefined configurations to make them work in Console projects (e.g., environment variables, config maps, probes...).
   - proxy: Proxies are specific configurations used to invoke APIs that are not part of the current project but may be exposed by an external provider or another project. Proxies can be instantiated from the dedicated section of the Console Design area.
   - sidecar: Sidecars are secondary utility containers running side by side with the main container in the same host. They are Docker images that can be instantiated from the dedicated section of the Console Design area.
-  - template: Templates can be instantiated in Console the same as plugins. The difference is that they provide an archive that is cloned in the Project scope, instead of a Docker image, giving developers direct access to the codebase to evolve it at will. Templates are meant to be starting points with the bear minimum needed to start a service. Just like plugins, templates may also come with some predefined configurations.
+  - template: Teamplates can be instantiated in Console the same as plugins. The difference is that they provide an archive that is cloned in the Project scope, instead of a Docker image, giving developers direct access to the codebase to evolve it at will. Templates are meant to be starting points with the bear minimum needed to start a service. Just like plugins, templates may also come with some predefined configurations.
   - infrastructure-component-runtime: Infrastructure Component runtime items are custom objects that are not part of the standard Console supported resources. They can be managed in the context of Infrastructure Project to be able to collect runtime data for visualization within Console.
   `,
   MARKETPLACE_ITEM_TENANT_ID: `The tenant of the marketplace item. Can be found in the tenantId field of the ${toolNames.LIST_MARKETPLACE} tool`,
@@ -149,11 +178,6 @@ export const paramsDescriptions = {
   The Mia-Platform Console company or tenant for which to return both the public and private marketplace resources.
   Can be found in the tenantId field of the ${toolNames.LIST_TENANTS} tool.
   `,
-  MARKETPLACE_ITD_LIST_NAMESPACE: `A comma-separated list of tenant ids to filter Item Type Definitions by (it will be matched against metadata.namespace.id). Can be found in the tenantId field of the ${toolNames.LIST_MARKETPLACE} tool`,
-  MARKETPLACE_ITD_LIST_NAME: `A comma-separated list of names to filter Item Type Definitions by (it will be matched against metadata.name)`,
-  MARKETPLACE_ITD_LIST_DISPLAY_NAME: `A comma-separated list of display names to filter Item Type Definitions by (it will be matched against metadata.displayName)`,
-  MARKETPLACE_ITD_TENANT_ID: `The tenant id of the marketplace Item Type Definition (it will be matched against metadata.namespace.id). Can be found in the tenantId field of the ${toolNames.LIST_MARKETPLACE} tool`,
-  MARKETPLACE_ITD_NAME: `The name of the marketplace Item Type Definition (it will be matched against metadata.name). Can be found in the metadata.name field of the ${toolNames.LIST_MARKETPLACE_ITEM_TYPE_DEFINITIONS} tool`,
 
   // Project
   PROJECT_ID: `The project to use. Can be found in the _id field of the ${toolNames.LIST_PROJECTS} tool`,
@@ -169,11 +193,632 @@ export const paramsDescriptions = {
   // Configuration
   REF_TYPE: `The type of the reference to use, can be revision or version. Can be found in the ${toolNames.LIST_CONFIGURATION_REVISIONS} tool`,
   REF_ID: `The id of the reference to use, can be the revision or version. Can be found in the ${toolNames.LIST_CONFIGURATION_REVISIONS} tool`,
-  COLLECTION_NAME: `The name of the collection to create. Must be a valid identifier (letters, numbers, underscores).`,
-  COLLECTION_FIELDS: `The user-defined fields for the collection. Each field should be an object with: name (string), type (string), description (string). Supported types: "string", "number", "boolean", "Date", "ObjectId", "Array_string", "Array_number", "Array_RawObject", "RawObject". Example: [{"name": "firstName", "type": "string", "description": "User first name"}, {"name": "age", "type": "number", "description": "User age"}]`,
-  ENDPOINT_TYPE: `The type of endpoint to create. Can be "custom" for service endpoints or "crud" for collection endpoints.`,
-  ENDPOINT_NAME: `The name of the endpoint to create. This will be used as the basePath (e.g., "/customer" for name "customer").`,
-  ENDPOINT_TARGET: `The target for the endpoint. For custom endpoints, this is the service name. For crud endpoints, this is the collection name.`,
+  ENDPOINTS: `
+  The endpoints to create or update. If a service with componentId of api-gateway or api-gateway-envoy not exists in the project, create it with ${toolNames.CREATE_SERVICE_FROM_MARKETPLACE} tool. The key is the path of the endpoint, the value is the endpoint object.
+  Always set the tags to the endpoint, if not specified it can be set to empty array.
+  An example of a custom endpoint is:
+  {
+    "basePath": "/echo",
+    "type": "custom",
+    "public": false,
+    "showInDocumentation": true,
+    "secreted": false,
+    "acl": "true",
+    "service": "echo-service",
+    "port": "80",
+    "pathRewrite": "/",
+    "description": "Endpoint /echo",
+    "tags": [
+      "echo-service"
+    ],
+    "backofficeAcl": {
+      "inherited": true
+    },
+    "allowUnknownRequestContentType": false,
+    "allowUnknownResponseContentType": false,
+    "forceMicroserviceGatewayProxy": false,
+    "listeners": {
+      "frontend": true
+    },
+    "useDownstreamProtocol": true
+  }
+
+  If you want to expose an endpoint which targets the crud-service, use the following example, the routes supported
+  are the only ones defined in the example, no other routes are supported:
+{
+    "basePath": "/books",
+    "pathName": "/",
+    "pathRewrite": "/books",
+    "type": "crud",
+    "tags": [
+      "crud"
+    ],
+    "description": "Endpoint /crud-books",
+    "collectionId": "books",
+    "public": true,
+    "secreted": false,
+    "showInDocumentation": true,
+    "acl": "true",
+    "backofficeAcl": {
+      "inherited": true
+    },
+    "allowUnknownRequestContentType": false,
+    "allowUnknownResponseContentType": false,
+    "forceMicroserviceGatewayProxy": false,
+    "routes": {
+      "GET/": {
+        "id": "GET/",
+        "verb": "GET",
+        "path": "/",
+        "public": {
+          "inherited": true
+        },
+        "secreted": {
+          "inherited": true
+        },
+        "showInDocumentation": {
+          "inherited": true
+        },
+        "acl": {
+          "inherited": true
+        },
+        "backofficeAcl": {
+          "inherited": true
+        },
+        "rateLimit": {
+          "inherited": true
+        },
+        "allowUnknownRequestContentType": {
+          "inherited": true
+        },
+        "allowUnknownResponseContentType": {
+          "inherited": true
+        },
+        "preDecorators": [],
+        "postDecorators": []
+      },
+      "POST/": {
+        "id": "POST/",
+        "verb": "POST",
+        "path": "/",
+        "public": {
+          "inherited": true
+        },
+        "secreted": {
+          "inherited": true
+        },
+        "showInDocumentation": {
+          "inherited": true
+        },
+        "acl": {
+          "inherited": true
+        },
+        "backofficeAcl": {
+          "inherited": true
+        },
+        "rateLimit": {
+          "inherited": true
+        },
+        "allowUnknownRequestContentType": {
+          "inherited": true
+        },
+        "allowUnknownResponseContentType": {
+          "inherited": true
+        },
+        "preDecorators": [],
+        "postDecorators": []
+      },
+      "GET/export": {
+        "id": "GET/export",
+        "verb": "GET",
+        "path": "/export",
+        "public": {
+          "inherited": true
+        },
+        "secreted": {
+          "inherited": true
+        },
+        "showInDocumentation": {
+          "inherited": true
+        },
+        "acl": {
+          "inherited": true
+        },
+        "backofficeAcl": {
+          "inherited": true
+        },
+        "rateLimit": {
+          "inherited": true
+        },
+        "allowUnknownRequestContentType": {
+          "inherited": true
+        },
+        "allowUnknownResponseContentType": {
+          "inherited": false,
+          "value": true
+        },
+        "preDecorators": [],
+        "postDecorators": []
+      },
+      "GET/:id": {
+        "id": "GET/:id",
+        "verb": "GET",
+        "path": "/:id",
+        "public": {
+          "inherited": true
+        },
+        "secreted": {
+          "inherited": true
+        },
+        "showInDocumentation": {
+          "inherited": true
+        },
+        "acl": {
+          "inherited": true
+        },
+        "backofficeAcl": {
+          "inherited": true
+        },
+        "rateLimit": {
+          "inherited": true
+        },
+        "allowUnknownRequestContentType": {
+          "inherited": true
+        },
+        "allowUnknownResponseContentType": {
+          "inherited": true
+        },
+        "preDecorators": [],
+        "postDecorators": []
+      },
+      "DELETE/:id": {
+        "id": "DELETE/:id",
+        "verb": "DELETE",
+        "path": "/:id",
+        "public": {
+          "inherited": true
+        },
+        "secreted": {
+          "inherited": true
+        },
+        "showInDocumentation": {
+          "inherited": true
+        },
+        "acl": {
+          "inherited": true
+        },
+        "backofficeAcl": {
+          "inherited": true
+        },
+        "rateLimit": {
+          "inherited": true
+        },
+        "allowUnknownRequestContentType": {
+          "inherited": true
+        },
+        "allowUnknownResponseContentType": {
+          "inherited": true
+        },
+        "preDecorators": [],
+        "postDecorators": []
+      },
+      "DELETE/": {
+        "id": "DELETE/",
+        "verb": "DELETE",
+        "path": "/",
+        "public": {
+          "inherited": true
+        },
+        "secreted": {
+          "inherited": true
+        },
+        "showInDocumentation": {
+          "inherited": true
+        },
+        "acl": {
+          "inherited": true
+        },
+        "backofficeAcl": {
+          "inherited": true
+        },
+        "rateLimit": {
+          "inherited": true
+        },
+        "allowUnknownRequestContentType": {
+          "inherited": true
+        },
+        "allowUnknownResponseContentType": {
+          "inherited": true
+        },
+        "preDecorators": [],
+        "postDecorators": []
+      },
+      "PATCH/:id": {
+        "id": "PATCH/:id",
+        "verb": "PATCH",
+        "path": "/:id",
+        "public": {
+          "inherited": true
+        },
+        "secreted": {
+          "inherited": true
+        },
+        "showInDocumentation": {
+          "inherited": true
+        },
+        "acl": {
+          "inherited": true
+        },
+        "backofficeAcl": {
+          "inherited": true
+        },
+        "rateLimit": {
+          "inherited": true
+        },
+        "allowUnknownRequestContentType": {
+          "inherited": true
+        },
+        "allowUnknownResponseContentType": {
+          "inherited": true
+        },
+        "preDecorators": [],
+        "postDecorators": []
+      },
+      "PATCH/": {
+        "id": "PATCH/",
+        "verb": "PATCH",
+        "path": "/",
+        "public": {
+          "inherited": true
+        },
+        "secreted": {
+          "inherited": true
+        },
+        "showInDocumentation": {
+          "inherited": true
+        },
+        "acl": {
+          "inherited": true
+        },
+        "backofficeAcl": {
+          "inherited": true
+        },
+        "rateLimit": {
+          "inherited": true
+        },
+        "allowUnknownRequestContentType": {
+          "inherited": true
+        },
+        "allowUnknownResponseContentType": {
+          "inherited": true
+        },
+        "preDecorators": [],
+        "postDecorators": []
+      },
+      "GET/count": {
+        "id": "GET/count",
+        "verb": "GET",
+        "path": "/count",
+        "public": {
+          "inherited": true
+        },
+        "secreted": {
+          "inherited": true
+        },
+        "showInDocumentation": {
+          "inherited": true
+        },
+        "acl": {
+          "inherited": true
+        },
+        "backofficeAcl": {
+          "inherited": true
+        },
+        "rateLimit": {
+          "inherited": true
+        },
+        "allowUnknownRequestContentType": {
+          "inherited": true
+        },
+        "allowUnknownResponseContentType": {
+          "inherited": true
+        },
+        "preDecorators": [],
+        "postDecorators": []
+      },
+      "POST/bulk": {
+        "id": "POST/bulk",
+        "verb": "POST",
+        "path": "/bulk",
+        "public": {
+          "inherited": true
+        },
+        "secreted": {
+          "inherited": true
+        },
+        "showInDocumentation": {
+          "inherited": true
+        },
+        "acl": {
+          "inherited": true
+        },
+        "backofficeAcl": {
+          "inherited": true
+        },
+        "rateLimit": {
+          "inherited": true
+        },
+        "allowUnknownRequestContentType": {
+          "inherited": true
+        },
+        "allowUnknownResponseContentType": {
+          "inherited": true
+        },
+        "preDecorators": [],
+        "postDecorators": []
+      },
+      "POST/upsert-one": {
+        "id": "POST/upsert-one",
+        "verb": "POST",
+        "path": "/upsert-one",
+        "public": {
+          "inherited": true
+        },
+        "secreted": {
+          "inherited": true
+        },
+        "showInDocumentation": {
+          "inherited": true
+        },
+        "acl": {
+          "inherited": true
+        },
+        "backofficeAcl": {
+          "inherited": true
+        },
+        "rateLimit": {
+          "inherited": true
+        },
+        "allowUnknownRequestContentType": {
+          "inherited": true
+        },
+        "allowUnknownResponseContentType": {
+          "inherited": true
+        },
+        "preDecorators": [],
+        "postDecorators": []
+      },
+      "PATCH/bulk": {
+        "id": "PATCH/bulk",
+        "verb": "PATCH",
+        "path": "/bulk",
+        "public": {
+          "inherited": true
+        },
+        "secreted": {
+          "inherited": true
+        },
+        "showInDocumentation": {
+          "inherited": true
+        },
+        "acl": {
+          "inherited": true
+        },
+        "backofficeAcl": {
+          "inherited": true
+        },
+        "rateLimit": {
+          "inherited": true
+        },
+        "allowUnknownRequestContentType": {
+          "inherited": true
+        },
+        "allowUnknownResponseContentType": {
+          "inherited": true
+        },
+        "preDecorators": [],
+        "postDecorators": []
+      },
+      "POST/:id/state": {
+        "id": "POST/:id/state",
+        "verb": "POST",
+        "path": "/:id/state",
+        "public": {
+          "inherited": true
+        },
+        "secreted": {
+          "inherited": true
+        },
+        "showInDocumentation": {
+          "inherited": true
+        },
+        "acl": {
+          "inherited": true
+        },
+        "backofficeAcl": {
+          "inherited": true
+        },
+        "rateLimit": {
+          "inherited": true
+        },
+        "allowUnknownRequestContentType": {
+          "inherited": true
+        },
+        "allowUnknownResponseContentType": {
+          "inherited": true
+        },
+        "preDecorators": [],
+        "postDecorators": []
+      },
+      "POST/state": {
+        "id": "POST/state",
+        "verb": "POST",
+        "path": "/state",
+        "public": {
+          "inherited": true
+        },
+        "secreted": {
+          "inherited": true
+        },
+        "showInDocumentation": {
+          "inherited": true
+        },
+        "acl": {
+          "inherited": true
+        },
+        "backofficeAcl": {
+          "inherited": true
+        },
+        "rateLimit": {
+          "inherited": true
+        },
+        "allowUnknownRequestContentType": {
+          "inherited": true
+        },
+        "allowUnknownResponseContentType": {
+          "inherited": true
+        },
+        "preDecorators": [],
+        "postDecorators": []
+      }
+    },
+    "listeners": {
+      "frontend": true
+    }
+  }
+`,
+  COLLECTIONS: `The crud-service collection to create or update. The key is the name of the collection, the value is the collection object. If crud-service not exists in the project, create it with ${toolNames.CREATE_SERVICE_FROM_MARKETPLACE} tool.
+  An example of a crud-service collection is:
+  {
+    "id": "users",
+    "name": "users",
+    "fields": [
+      {
+        "name": "_id",
+        "type": "ObjectId",
+        "required": true,
+        "nullable": false,
+        "description": "_id"
+      },
+      {
+        "name": "creatorId",
+        "type": "string",
+        "required": true,
+        "nullable": false,
+        "description": "creatorId"
+      },
+      {
+        "name": "createdAt",
+        "type": "Date",
+        "required": true,
+        "nullable": false,
+        "description": "createdAt"
+      },
+      {
+        "name": "updaterId",
+        "type": "string",
+        "required": true,
+        "nullable": false,
+        "description": "updaterId"
+      },
+      {
+        "name": "updatedAt",
+        "type": "Date",
+        "required": true,
+        "nullable": false,
+        "description": "updatedAt"
+      },
+      {
+        "name": "__STATE__",
+        "type": "string",
+        "required": true,
+        "nullable": false,
+        "description": "__STATE__"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": false,
+        "nullable": false,
+        "sensitivityValue": 0
+      },
+      {
+        "name": "items",
+        "type": "Array_RawObject",
+        "required": false,
+        "nullable": false,
+        "sensitivityValue": 0
+      },
+      {
+        "name": "tags",
+        "type": "Array_string",
+        "required": false,
+        "nullable": false,
+        "sensitivityValue": 0
+      },
+      {
+        "name": "rates",
+        "type": "Array_number",
+        "required": false,
+        "nullable": false,
+        "sensitivityValue": 0
+      },
+      {
+        "name": "preferences",
+        "type": "RawObject",
+        "required": false,
+        "nullable": false,
+        "sensitivityValue": 0
+      }
+    ],
+    "internalEndpoints": [
+      {
+        "basePath": "/users",
+        "defaultState": "PUBLIC"
+      }
+    ],
+    "type": "collection",
+    "indexes": [
+      {
+        "name": "_id",
+        "type": "normal",
+        "unique": true,
+        "fields": [
+          {
+            "name": "_id",
+            "order": 1
+          }
+        ]
+      },
+      {
+        "name": "createdAt",
+        "type": "normal",
+        "unique": false,
+        "fields": [
+          {
+            "name": "createdAt",
+            "order": -1
+          }
+        ]
+      },
+      {
+        "name": "stateIndex",
+        "type": "normal",
+        "unique": false,
+        "fields": [
+          {
+            "name": "__STATE__",
+            "order": 1
+          }
+        ]
+      }
+    ],
+    "description": "Collection of users",
+    "tags": [
+      "collection"
+    ]
+  }
+`,
   SERVICES: `The services to create or update. The key is the name of the service, the value is the service object. If the service not exists in the project, create it with ${toolNames.CREATE_SERVICE_FROM_MARKETPLACE} tool.
   An example of a service is:
   {
@@ -319,4 +964,27 @@ export const paramsDescriptions = {
   // Runtime
   POD_NAME: `The name of the pod to get the logs from. Can be found in the response of the ${toolNames.LIST_PODS} tool`,
   CONTAINER_NAME: `The name of the container pod to get the logs from. Can be found in the response of the ${toolNames.LIST_PODS} tool`,
+
+  // P4SaMD
+  SYSTEM_VERSION: `The System Version identifier to check (e.g., 'v1.2.3' or '0.2.3). This value must be one of the names returned by the ${toolNames.LIST_VERSIONS} tool.`,
+
+  LENGTH: `The length of items to return in the response`,
+  SKIP: `The number of items to skip before starting to collect the result set`,
+  SEARCH: `A search string to filter the results based on a substring of some fields`,
+  SORT: `The field by which to sort the results (e.g., 'name', 'createdAt'). Prefix with '-' for descending order.`,
+
+  REQUIREMENT_TYPE: `The type of requirements to filter (e.g., 'functional', 'non-functional', 'regulatory')`,
+  REQUIREMENT_ID: `The unique identifier of the requirement to retrieve. This value must be one of the _id fields returned by the ${toolNames.LIST_REQUIREMENTS} tool.`,
+
+  RISK_ID: `The unique identifier of the risk to retrieve. This value must be one of the _id fields returned by the ${toolNames.LIST_RISKS} tool.`,
+
+  TEST_TYPE: `The type of tests to filter (e.g.,  'Integration', 'System')`,
+  TEST_EXECUTION_MODE: `The execution mode of tests to filter (e.g., 'Manual', 'Automatic')`,
+  TEST_OUTCOME: `The outcomes of tests to filter (e.g., 'TO DO', 'SUCCESS', 'FAILED')`,
+  TEST_ID: `The unique identifier of the test to retrieve. This value must be one of the _id fields returned by the ${toolNames.LIST_TESTS} tool.`,
+
+  CHANGE_REQUEST_CLASSIFICATION: `The classification of change requests to filter (e.g., 'minor', 'major', 'bugfix', 'hotfix)`,
+  CHANGE_REQUEST_ID: `The unique identifier of the change request to retrieve. This value must be one of the _id fields returned by the ${toolNames.LIST_CHANGE_REQUESTS} tool.`,
+
+  REFERENCE_CATEGORIES: `The categories of references to filter (e.g., 'Plan', 'SOP', 'Regulation', 'Standard', 'Guideline')`,
 }

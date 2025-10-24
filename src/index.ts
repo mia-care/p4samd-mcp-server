@@ -32,17 +32,16 @@ program.
 
 program.
   command('start').
-  description('start the Mia-Platform Console MCP Server').
+  description('start the P4SaM Console MCP Server').
   option('--stdio', 'run the server in stdio mode (default when using npx)', false).
   option('--server-host <serverHost>', 'host to expose the server on', '0.0.0.0').
   addOption(new Option('-p, --port <port>', 'port to run the server on').env('HTTP_PORT').default('3000')).
-  addOption(new Option('--host <host>', 'Mia-Platform Console host').env('CONSOLE_HOST')).
-  action(({ host, stdio, port, serverHost }) => {
-    const clientID = process.env.MIA_PLATFORM_CLIENT_ID || ''
-    const clientSecret = process.env.MIA_PLATFORM_CLIENT_SECRET || ''
+  action(({ stdio, port, serverHost }) => {
+    const p4samdUrl = process.env.P4SAMD_URL || ''
+    const p4samdApiKey = process.env.P4SAMD_API_KEY || ''
 
     if (stdio) {
-      return runStdioServer(host, clientID, clientSecret).catch((error) => {
+      return runStdioServer(p4samdUrl, p4samdApiKey).catch((error) => {
         console.error('Fatal error:', error)
         process.exit(1)
       })
@@ -52,9 +51,8 @@ program.
       logger: true,
     })
     fastify.register(httpServer, {
-      host,
-      clientID,
-      clientSecret,
+      p4samdUrl,
+      p4samdApiKey,
     })
 
     return fastify.listen({ port: parseInt(port, 10), host: serverHost }, function (err) {

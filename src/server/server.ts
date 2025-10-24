@@ -16,23 +16,14 @@
 import { Implementation } from '@modelcontextprotocol/sdk/types.js'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { ServerOptions } from '@modelcontextprotocol/sdk/server/index.js'
-import { UndiciHeaders } from 'undici/types/dispatcher'
 
-import { addConfigurationCapabilities } from '../tools/configuration'
-import { addDeployCapabilities } from '../tools/deploy'
-import { addDeployPrompt } from '../prompts'
-import { addGovernanceCapabilities } from '../tools/governance'
-import { addMarketplaceCapabilities } from '../tools/marketplace'
-import { addRuntimeCapabilities } from '../tools/runtime'
-import { addServicesCapabilities } from '../tools/services'
+import { addP4SaMDCapabilities } from '../tools'
 import { APIClient } from '../apis/client'
 import { description, name, version } from '../../package.json'
 
 export function getMcpServer (
-  host: string,
-  clientID: string,
-  clientSecret: string,
-  additionalHeaders: UndiciHeaders = {},
+  p4samdUrl: string,
+  p4samdApiKey: string,
 ): McpServer {
   const implementation: Implementation = {
     name,
@@ -51,18 +42,9 @@ export function getMcpServer (
 
   const server = new McpServer(implementation, options)
 
-  const apiClient = new APIClient(host, clientID, clientSecret, additionalHeaders)
+  const apiClient = new APIClient(p4samdUrl, p4samdApiKey)
 
-  // Tools
-  addMarketplaceCapabilities(server, apiClient)
-  addGovernanceCapabilities(server, apiClient)
-  addServicesCapabilities(server, apiClient)
-  addConfigurationCapabilities(server, apiClient)
-  addDeployCapabilities(server, apiClient)
-  addRuntimeCapabilities(server, apiClient)
-
-  // Prompts
-  addDeployPrompt(server)
+  addP4SaMDCapabilities(server, apiClient)
 
   return server
 }
