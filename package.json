@@ -1,7 +1,7 @@
 {
-  "name": "@mia-platform/console-mcp-server",
-  "version": "1.0.6",
-  "description": "Mia-Platform Console MCP Server",
+  "name": "@mia-care/p4samd-mcp-server",
+  "version": "1.0.0",
+  "description": "Mia-Care P4SaMD MCP Server",
   "main": "mcp-server/index.js",
   "bin": {
     "console-mcp-server": "mcp-server/index.js"
@@ -19,17 +19,12 @@
     "start": "npm run build && node mcp-server start",
     "start:stdio": "npm run start -- --stdio",
     "test": "npm run test-base 'src/**/*.test.ts'",
-    "test-base": "node --test --import tsx "
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mia-platform/console-mcp-server.git"
+    "test-base": "node --test --import tsx ",
+    "update-docker-version": "sed -i.bck \"s|version=\\\"[0-9]*\\.[0-9]*\\.[0-9]*.*\\\"|version=\\\"${npm_package_version}\\\"|\" Dockerfile",
+    "update-changelog": "node .scripts/update-changelog.js ${npm_package_version}",
+    "version": "npm run update-changelog && npm run update-docker-version && rm -fr Dockerfile.bck && git add CHANGELOG.md Dockerfile"
   },
   "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/mia-platform/console-mcp-server/issues"
-  },
-  "homepage": "https://github.com/mia-platform/console-mcp-server#readme",
   "dependencies": {
     "@mia-platform/console-types": "^0.39.0",
     "@modelcontextprotocol/sdk": "^1.17.5",
