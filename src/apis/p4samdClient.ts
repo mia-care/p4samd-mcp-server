@@ -20,10 +20,10 @@ import {
   GetChangeRequestsApiResponse, GetKpisApiResponse, GetReferencesApiResponse,
   GetRequirementsApiResponse,
   GetRisksApiResponse,
-  GetTestsApiResponse,
+  GetTestsApiResponse, GetTestSuitesApiResponse, GetTestSuitesExecutionsApiResponse,
   Requirement,
-  Risk,
-  Test,
+  Risk, SoftwareItem, SoftwareItemHistoryItem,
+  Test, TestSuite, TestSuiteExecution,
 } from './types'
 
 export class P4samdClient {
@@ -46,7 +46,7 @@ export class P4samdClient {
     return await res.body.json() as Record<string, unknown>[]
   }
 
-  async listRequirements (systemVersion: string, length: number, skip: number, sort?: string, search?: string, type?: string): Promise<GetRequirementsApiResponse> {
+  async listRequirements (systemVersion: string, length: number, skip: number, sort?: string, search?: string, type?: string[]): Promise<GetRequirementsApiResponse> {
     const res = await request(
       `${this.#p4samdUrl}/p4samd-m2m/requirements`,
       {
@@ -57,7 +57,7 @@ export class P4samdClient {
           skip,
           ...sort && { sort },
           ...search && { search },
-          ...type && { type },
+          ...type && { type: type.join(',') },
         },
         headers: { secret: this.#apiKey },
       },
@@ -198,5 +198,94 @@ export class P4samdClient {
       },
     )
     return await res.body.json() as GetKpisApiResponse
+  }
+
+  async listTestSuites (systemVersionId: string, length: number, skip: number, sort?: string, search?: string, executionMode?: string): Promise<GetTestSuitesApiResponse> {
+    const res = await request(
+      `${this.#p4samdUrl}/p4samd-m2m/test-suites`,
+      {
+        method: 'GET',
+        query: {
+          systemVersionId,
+          length,
+          skip,
+          ...sort && { sort },
+          ...search && { search },
+          ...executionMode && { executionMode },
+        },
+        headers: { secret: this.#apiKey },
+      },
+    )
+    return await res.body.json() as GetTestSuitesApiResponse
+  }
+
+  async getTestSuiteById (id: string): Promise<TestSuite> {
+    const res = await request(
+      `${this.#p4samdUrl}/p4samd-m2m/test-suites/${id}`,
+      {
+        method: 'GET',
+        headers: { secret: this.#apiKey },
+      },
+    )
+
+    return await res.body.json() as TestSuite
+  }
+
+  async listTestSuitesExecutions (systemVersionId: string, length: number, skip: number, sort?: string, testSuiteId?: string): Promise<GetTestSuitesExecutionsApiResponse> {
+    const res = await request(
+      `${this.#p4samdUrl}/p4samd-m2m/test-suites-executions`,
+      {
+        method: 'GET',
+        query: {
+          systemVersionId,
+          length,
+          skip,
+          ...sort && { sort },
+          ...testSuiteId && { testSuiteId },
+        },
+        headers: { secret: this.#apiKey },
+      },
+    )
+    return await res.body.json() as GetTestSuitesExecutionsApiResponse
+  }
+
+  async getTestSuiteExecutionById (id: string): Promise<TestSuiteExecution> {
+    const res = await request(
+      `${this.#p4samdUrl}/p4samd-m2m/test-suites-executions/${id}`,
+      {
+        method: 'GET',
+        headers: { secret: this.#apiKey },
+      },
+    )
+
+    return await res.body.json() as TestSuiteExecution
+  }
+
+  async listSoftwareItems (systemVersionId: string): Promise<SoftwareItem[]> {
+    const res = await request(
+      `${this.#p4samdUrl}/p4samd-m2m/table-software-items`,
+      {
+        method: 'GET',
+        query: {
+          version: systemVersionId,
+        },
+        headers: { secret: this.#apiKey },
+      },
+    )
+    return await res.body.json() as SoftwareItem[]
+  }
+
+  async getSoftwareItemHistory (id: string): Promise<SoftwareItemHistoryItem[]> {
+    const res = await request(
+      `${this.#p4samdUrl}/p4samd-m2m/software-items/${id}/history/download`,
+      {
+        method: 'GET',
+        query: {
+          type: 'json',
+        },
+        headers: { secret: this.#apiKey },
+      },
+    )
+    return await res.body.json() as SoftwareItemHistoryItem[]
   }
 }

@@ -1,3 +1,5 @@
+import { TestExecutionModes, TestExecutionsOutcomes } from './enums'
+
 export const JiraUserSchema = {
   type: 'object',
   properties: {
@@ -253,3 +255,189 @@ export interface GetKpisApiResponse {
   softwareItemsIndex: KpiIndex
   versionIndex: KpiIndex
 }
+
+export const testSuiteSchema = {
+  type: 'object',
+  properties: {
+    _id: { type: 'string' },
+    name: { type: 'string' },
+    executionMode: {
+      type: 'string',
+      enum: TestExecutionModes,
+    },
+    tests: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: true,
+      },
+    },
+    type: { type: 'string' },
+    apiTrigger:
+      {
+        type: 'object',
+        properties: {
+          method: { type: 'string' },
+          endpoint: { type: 'string' },
+          protocol: { type: 'string' },
+          timeout: { type: 'number' },
+          payload: { type: 'object', properties: { format: { type: 'string' }, data: { type: 'string' }, hidden: { type: 'string' } }, additionalProperties: false },
+          headers: { type: 'array', items: { type: 'object', properties: { key: { type: 'string' }, value: { type: 'string' }, id: { type: 'string' }, hidden: { type: 'string' } } } },
+        },
+        additionalProperties: false,
+      },
+    systemVersionId: { type: 'string' },
+    systemVersionName: { type: 'string' },
+    lastExecution: { type: 'object' },
+    localTestRuns: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          _id: { type: 'string' },
+          status: { type: 'string' },
+          outcome: { type: 'string' },
+          message: { type: 'string' },
+          executionDatetime: { type: 'string', format: 'date-time' },
+        },
+        additionalProperties: true,
+      },
+    },
+  },
+} as const
+
+export type TestSuite = typeof testSuiteSchema
+
+export interface GetTestSuitesApiResponse {
+  total: number
+  length: number
+  skip: number
+  items: TestSuite[]
+}
+
+export const testSuiteExecutionSchema = {
+  type: 'object',
+  properties: {
+    _id: { type: 'string' },
+    systemVersionId: { type: 'string' },
+    testJobsIds: {
+      type: 'array',
+      items: { type: 'string' },
+    },
+    testJobs: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          _id: { type: 'string' },
+          jobId: { type: 'string' },
+          testId: { type: 'string' },
+          testSuite: testSuiteSchema,
+          fileId: { type: 'string' },
+          status: { type: 'string', enum: [ 'SUCCESS', 'ERROR', 'WARNING' ] },
+          outcome: { type: 'string', enum: TestExecutionsOutcomes },
+          message: { type: 'string' },
+          result: { type: 'object', properties: { success: { type: 'number' }, failed: { type: 'number' }, skipped: { type: 'number' } }, additionalProperties: false },
+          testsResults: { type: 'array', items: { type: 'object', properties: { name: { type: 'string' }, outcome: { type: 'string' } } } },
+          executionDatetime: { type: 'string', format: 'date-time' },
+        },
+      },
+    },
+    note: { type: 'string' },
+    executor: { type: 'object', properties: { name: { type: 'string' }, email: { type: 'string' } } },
+    testJobsCount: { type: 'number' },
+    createdAt: { type: 'string' },
+  },
+} as const
+
+export type TestSuiteExecution = typeof testSuiteExecutionSchema
+
+export interface GetTestSuitesExecutionsApiResponse {
+  total: number
+  length: number
+  skip: number
+  items: TestSuiteExecution[]
+}
+
+export const SWI_VERIFICATION_STATUS = {
+  OK: 'OK',
+  OK_MISSING_APPROVAL: 'OK_MISSING_APPROVAL',
+  VERSION_DISCREPANCY: 'VERSION_DISCREPANCY',
+  MISSING_IMPLEMENTATION: 'MISSING_IMPLEMENTATION',
+  MISSING_DESIGN: 'MISSING_DESIGN',
+  UNDETECTABLE: 'UNDETECTABLE',
+  MISSING_TAG: 'MISSING_TAG',
+  INVALID_VERSION: 'INVALID_VERSION',
+}
+
+export const SWI_VERIFICATION_TYPES = {
+  PROJECT: 'project',
+  SERVICE: 'service',
+  LIBRARY: 'library',
+  OTHER: 'other',
+}
+
+const softwareItemSchema = {
+  type: 'object',
+  $id: 'swiVerificationSchema',
+  properties: {
+    _id: { type: 'string' },
+    name: { type: 'string' },
+    expectedVersion: { type: 'string' },
+    detectedVersion: { type: 'string' },
+    type: { type: 'string', enum: Object.values(SWI_VERIFICATION_TYPES) },
+    verificationStatus: { type: 'string', enum: Object.values(SWI_VERIFICATION_STATUS), default: SWI_VERIFICATION_STATUS.UNDETECTABLE },
+    isSoup: { type: 'boolean' },
+    isApproved: { type: 'boolean' },
+    isMedicalDevice: { type: 'boolean' },
+    class: { type: 'string' },
+    manufacturer: { type: 'string' },
+    repositoryLink: { type: 'string' },
+    repositoryId: { type: 'string' },
+    license: { type: 'string' },
+    verificationReason: { type: 'string' },
+    requiredSwHw: { type: 'string' },
+    implementationLink: { type: 'string' },
+    isAI: { type: 'boolean' },
+    aiType: { type: 'string', enum: [ 'model', 'agent' ] },
+    aiBiasMitigation: { type: 'string' },
+    aiTransparencyExplainability: { type: 'string' },
+    aiModelTechnicalDocumentation: { type: 'string' },
+    aiModelLocation: { type: 'string' },
+    aiRiskClassification: { type: 'string', enum: [ 'unacceptable', 'high-risk', 'limited', 'minimum' ] },
+    aiRiskClassificationDescription: { type: 'string' },
+    callToActionUrl: { type: 'string' },
+    children: {
+      type: 'array',
+      items: { $ref: 'swiVerificationSchema' },
+    },
+    suggestions: { type: 'array', items: { type: 'string' } },
+    vulnerabilities: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: true,
+      },
+    },
+    vulnerabilitiesOtherVersions: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: true,
+      },
+    },
+    openVulnerabilitiesCount: { type: 'number' },
+    acceptedVulnerabilitiesCount: { type: 'number' },
+  },
+} as const
+
+export type SoftwareItem = typeof softwareItemSchema
+
+export interface SoftwareItemHistoryItem {
+  action: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  metadata: any
+}
+

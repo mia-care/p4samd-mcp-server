@@ -63,3 +63,14 @@ export enum ReferenceCategories {
   Other = 'other',
   Standard = 'standard',
 }
+
+export enum TestExecutionsOutcomes {
+  Created = 'created',
+  InProgress = 'in-progress',
+  NotRun = 'not-run',
+  Running = 'Running',
+  Completed = 'completed',
+  Success = 'success',
+  Failed = 'failed',
+  RunFailed = 'run-failed',
+}

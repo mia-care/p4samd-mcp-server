@@ -5,25 +5,25 @@ import { z } from 'zod'
 
 import { paramsDescriptions, toolNames, toolsDescriptions } from '../../descriptions'
 
-export function registerListRisksTool (server: McpServer, client: IAPIClient) {
+export function registerListTestSuitesExecutionsTool (server: McpServer, client: IAPIClient) {
   server.tool(
-    toolNames.LIST_RISKS,
-    toolsDescriptions.LIST_RISKS,
+    toolNames.LIST_TEST_SUITES_EXECUTIONS,
+    toolsDescriptions.LIST_TEST_SUITES_EXECUTIONS,
     {
-      systemVersion: z.string().describe(paramsDescriptions.SYSTEM_VERSION_NAME),
+      systemVersionId: z.string().describe(paramsDescriptions.SYSTEM_VERSION_ID),
       length: z.number().optional().describe(paramsDescriptions.LENGTH),
       skip: z.number().optional().describe(paramsDescriptions.SKIP),
       sort: z.string().optional().describe(paramsDescriptions.SORT),
-      search: z.string().optional().describe(paramsDescriptions.SEARCH),
+      testSuiteId: z.string().optional().describe(paramsDescriptions.TEST_SUITE_ID),
     },
-    async ({ systemVersion, length, skip, sort, search }): Promise<CallToolResult> => {
+    async ({ systemVersionId, length, skip, sort, testSuiteId }): Promise<CallToolResult> => {
       try {
-        const data = await client.listRisks(
-          systemVersion,
+        const data = await client.listTestSuitesExecutions(
+          systemVersionId,
           length,
           skip,
           sort,
-          search,
+          testSuiteId
         )
         return {
           content: [
@@ -39,7 +39,7 @@ export function registerListRisksTool (server: McpServer, client: IAPIClient) {
           content: [
             {
               type: 'text',
-              text: `Error fetching requirements for version ${systemVersion}: ${err.message}`,
+              text: `Error fetching test suites executions for version id ${systemVersionId}: ${err.message}`,
             },
           ],
         }

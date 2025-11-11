@@ -19,17 +19,17 @@ import {
   GetChangeRequestsApiResponse, GetKpisApiResponse, GetReferencesApiResponse,
   GetRequirementsApiResponse,
   GetRisksApiResponse,
-  GetTestsApiResponse,
+  GetTestsApiResponse, GetTestSuitesApiResponse, GetTestSuitesExecutionsApiResponse,
   Requirement,
-  Risk,
-  Test,
+  Risk, SoftwareItem, SoftwareItemHistoryItem,
+  Test, TestSuite, TestSuiteExecution,
 } from './types'
 
 export const DEFAULT_DOCUMENTATION_PATH = '/documentation/json'
 
 export interface IAPIClient {
   listVersions (): Promise<Record<string, unknown>[]>
-  listRequirements (systemVersion: string, length?: number, skip?: number, sort?: string, search?: string, type?: string): Promise<GetRequirementsApiResponse>
+  listRequirements (systemVersion: string, length?: number, skip?: number, sort?: string, search?: string, type?: string[]): Promise<GetRequirementsApiResponse>
   getRequirementById (id: string): Promise<Requirement>
   listRisks (systemVersion: string, length?: number, skip?: number, sort?: string, search?: string): Promise<GetRisksApiResponse>
   getRiskById (id: string): Promise<Risk>
@@ -39,6 +39,12 @@ export interface IAPIClient {
   getChangeRequestById (id: string): Promise<ChangeRequest>
   listReferences(length?: number, skip?: number, sort?: string, search?: string, category?: string[]): Promise<GetReferencesApiResponse>
   listKpis(systemVersion: string): Promise<GetKpisApiResponse>
+  listTestSuites(systemVersionId: string, length?: number, skip?: number, sort?: string, search?: string, executionMode?: string): Promise<GetTestSuitesApiResponse>
+  getTestSuiteById(id: string): Promise<TestSuite>
+  listTestSuitesExecutions(systemVersionId: string, length?: number, skip?: number, sort?: string, testSuiteId?: string): Promise<GetTestSuitesExecutionsApiResponse>
+  getTestSuiteExecutionById(id: string): Promise<TestSuiteExecution>
+  listSoftwareItems(systemVersionId: string): Promise<SoftwareItem[]>
+  getSoftwareItemHistory(id: string): Promise<SoftwareItemHistoryItem[]>
 }
 
 export class APIClient implements IAPIClient {
@@ -56,7 +62,7 @@ export class APIClient implements IAPIClient {
     return this.#p4samdClient.listVersions()
   }
 
-  async listRequirements (systemVersion: string, length = 10, skip = 0, search?: string, sort?: string, type?: string): Promise<GetRequirementsApiResponse> {
+  async listRequirements (systemVersion: string, length = 10, skip = 0, search?: string, sort?: string, type?: string[]): Promise<GetRequirementsApiResponse> {
     return this.#p4samdClient.listRequirements(systemVersion, length, skip, sort, search, type)
   }
 
@@ -92,8 +98,31 @@ export class APIClient implements IAPIClient {
     return this.#p4samdClient.listReferences(length, skip, sort, search, category)
   }
 
-  async listKpis(systemVersion: string): Promise<GetKpisApiResponse>{
+  async listKpis (systemVersion: string): Promise<GetKpisApiResponse> {
     return this.#p4samdClient.listKpis(systemVersion)
   }
-}
 
+  async listTestSuites (systemVersionId: string, length = 10, skip = 0, sort?: string, search?: string, executionMode?: string): Promise<GetTestSuitesApiResponse> {
+    return this.#p4samdClient.listTestSuites(systemVersionId, length, skip, sort, search, executionMode)
+  }
+
+  async getTestSuiteById (id: string): Promise<TestSuite> {
+    return this.#p4samdClient.getTestSuiteById(id)
+  }
+
+  async listTestSuitesExecutions (systemVersionId: string, length = 10, skip = 0, sort?: string, testSuiteId?: string): Promise<GetTestSuitesExecutionsApiResponse> {
+    return this.#p4samdClient.listTestSuitesExecutions(systemVersionId, length, skip, sort, testSuiteId)
+  }
+
+  async getTestSuiteExecutionById (id: string): Promise<TestSuiteExecution> {
+    return this.#p4samdClient.getTestSuiteExecutionById(id)
+  }
+
+  async listSoftwareItems (systemVersionId: string): Promise<SoftwareItem[]> {
+    return this.#p4samdClient.listSoftwareItems(systemVersionId)
+  }
+
+  async getSoftwareItemHistory (id: string): Promise<SoftwareItemHistoryItem[]> {
+    return this.#p4samdClient.getSoftwareItemHistory(id)
+  }
+}

@@ -11,12 +11,12 @@ export function registerListRequirementsTool (server: McpServer, client: IAPICli
     toolNames.LIST_REQUIREMENTS,
     toolsDescriptions.LIST_REQUIREMENTS,
     {
-      systemVersion: z.string().describe(paramsDescriptions.SYSTEM_VERSION),
+      systemVersion: z.string().describe(paramsDescriptions.SYSTEM_VERSION_NAME),
       length: z.number().optional().describe(paramsDescriptions.LENGTH),
       skip: z.number().optional().describe(paramsDescriptions.SKIP),
       sort: z.string().optional().describe(paramsDescriptions.SORT),
       search: z.string().optional().describe(paramsDescriptions.SEARCH),
-      type: z.nativeEnum(RequirementTypes).optional().describe(paramsDescriptions.REQUIREMENT_TYPE),
+      type: z.array(z.nativeEnum(RequirementTypes)).optional().describe(paramsDescriptions.REQUIREMENT_TYPE),
     },
     async ({ systemVersion, length, skip, sort, search, type }): Promise<CallToolResult> => {
       try {

@@ -11,7 +11,7 @@ export function registerListChangeRequestsTool (server: McpServer, client: IAPIC
     toolNames.LIST_CHANGE_REQUESTS,
     toolsDescriptions.LIST_CHANGE_REQUESTS,
     {
-      systemVersion: z.string().describe(paramsDescriptions.SYSTEM_VERSION),
+      systemVersion: z.string().describe(paramsDescriptions.SYSTEM_VERSION_NAME),
       length: z.number().optional().describe(paramsDescriptions.LENGTH),
       skip: z.number().optional().describe(paramsDescriptions.SKIP),
       sort: z.string().optional().describe(paramsDescriptions.SORT),

@@ -11,7 +11,7 @@ export function registerListTestsTool (server: McpServer, client: IAPIClient) {
     toolNames.LIST_TESTS,
     toolsDescriptions.LIST_TESTS,
     {
-      systemVersion: z.string().describe(paramsDescriptions.SYSTEM_VERSION),
+      systemVersion: z.string().describe(paramsDescriptions.SYSTEM_VERSION_NAME),
       length: z.number().optional().describe(paramsDescriptions.LENGTH),
       skip: z.number().optional().describe(paramsDescriptions.SKIP),
       sort: z.nativeEnum(TestSortOptions).optional().describe(paramsDescriptions.SORT),

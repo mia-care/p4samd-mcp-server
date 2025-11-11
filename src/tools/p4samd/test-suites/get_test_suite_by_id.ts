@@ -5,16 +5,16 @@ import { z } from 'zod'
 
 import { paramsDescriptions, toolNames, toolsDescriptions } from '../../descriptions'
 
-export function registerListKpisTool (server: McpServer, client: IAPIClient) {
+export function registerGetTestSuiteByIdTool (server: McpServer, client: IAPIClient) {
   server.tool(
-    toolNames.LIST_KPIS,
-    toolsDescriptions.LIST_KPIS,
+    toolNames.GET_TEST_SUITE_BY_ID,
+    toolsDescriptions.GET_TEST_SUITE_BY_ID,
     {
-      systemVersion: z.string().describe(paramsDescriptions.SYSTEM_VERSION_NAME),
+      testSuiteId: z.string().describe(paramsDescriptions.TEST_SUITE_ID),
     },
-    async ({ systemVersion }): Promise<CallToolResult> => {
+    async ({ testSuiteId }): Promise<CallToolResult> => {
       try {
-        const data = await client.listKpis(systemVersion)
+        const data = await client.getTestSuiteById(testSuiteId)
         return {
           content: [
             {
@@ -29,7 +29,7 @@ export function registerListKpisTool (server: McpServer, client: IAPIClient) {
           content: [
             {
               type: 'text',
-              text: `Error fetching kpis for version ${systemVersion}: ${err.message}`,
+              text: `Error fetching test suite with id: ${testSuiteId}: ${err.message}`,
             },
           ],
         }
